@@ -1,0 +1,539 @@
+# French translations for Letters.
+# Copyright (C) 2026 Palkan Parsana
+# This file is distributed under the same license as the Letters project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Letters VERSION\n"
+"Report-Msgid-Bugs-To: palkan@frappe.io\n"
+"POT-Creation-Date: 2026-07-10 18:13+0034\n"
+"PO-Revision-Date: 2026-07-10 18:13+0034\n"
+"Last-Translator: palkan@frappe.io\n"
+"Language-Team: palkan@frappe.io\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Generated-By: Babel 2.13.1\n"
+
+#: letters/letters/api/sending.py:54
+msgid "'{0}' is not a valid email address."
+msgstr "« {0} » n'est pas une adresse e-mail valide."
+
+#: letters/letters/api/letters_api.py:192
+msgid "A template named {0} already exists"
+msgstr "Un modèle nommé {0} existe déjà"
+
+#. Label of a Check field in DocType 'Letters Template'
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Active"
+msgstr "Actif"
+
+#: letters/letters/doctype/letter/_sending.py:246
+msgid "All selected recipients have unsubscribed from this letter."
+msgstr ""
+"Tous les destinataires sélectionnés se sont désabonnés de cette lettre."
+
+#. Description of the 'Blocks JSON' (Code) field in DocType 'Letters Template'
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Block data that seeds the letter when this template is selected"
+msgstr ""
+"Données de blocs qui initialisent la lettre lorsque ce modèle est "
+"sélectionné"
+
+#. Label of a Code field in DocType 'Letter'
+#. Label of a Code field in DocType 'Letters Template'
+#: letters/letters/doctype/letter/letter.json
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Blocks JSON"
+msgstr "JSON des blocs"
+
+#. Label of a Long Text field in DocType 'Email Send'
+#: letters/letters/doctype/email_send/email_send.json
+msgid "Blocks JSON (snapshot)"
+msgstr "JSON des blocs (instantané)"
+
+#: letters/letters/doctype/letter/letter.py:24
+msgid "Cannot rename a letter while it is actively sending."
+msgstr "Impossible de renommer une lettre pendant son envoi."
+
+#. Label of a Data field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Canvas Background Color"
+msgstr "Couleur d'arrière-plan du canevas"
+
+#. Label of a Link field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Category"
+msgstr "Catégorie"
+
+#. Label of a Data field in DocType 'Letter Category'
+#: letters/letters/doctype/letter_category/letter_category.json
+msgid "Category Name"
+msgstr "Nom de la catégorie"
+
+#: letters/letters/doctype/letter/_sending.py:66
+msgid "Choose recipients before scheduling this letter."
+msgstr "Choisissez les destinataires avant de planifier cette lettre."
+
+#. Label of a Section Break field in DocType 'Email Send'
+#: letters/letters/doctype/email_send/email_send.json
+msgid "Content Snapshot"
+msgstr "Instantané du contenu"
+
+#: letters/public/frappe_customizations/notification.js:11
+msgid "Design with Letters"
+msgstr "Concevoir avec Letters"
+
+#. Option for the 'Status' (Select) field in DocType 'Email Send'
+#. Option for the 'Status' (Select) field in DocType 'Letter'
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/letter/letter.json
+msgid "Draft"
+msgstr "Brouillon"
+
+#: letters/letters/doctype/letter/letter.js:30
+msgid "Duplicate"
+msgstr "Dupliquer"
+
+#: letters/letters/doctype/letter/letter.js:38
+msgid "Duplicate {0} letter(s)?"
+msgstr "Dupliquer {0} lettre(s) ?"
+
+#. Label of a Data field in DocType 'Email Send Recipient'
+#: letters/letters/doctype/email_send_recipient/email_send_recipient.json
+msgid "Email"
+msgstr "E-mail"
+
+#. Label of a Data field in DocType 'Email Send'
+#: letters/letters/doctype/email_send/email_send.json
+msgid "Email Group"
+msgstr "Groupe d'e-mails"
+
+#: letters/www/letters_unsubscribe.py:21
+msgid "Email Preferences"
+msgstr "Préférences e-mail"
+
+#. Name of a DocType
+#: letters/letters/doctype/email_send/email_send.json
+msgid "Email Send"
+msgstr "Envoi d'e-mail"
+
+#. Name of a DocType
+#: letters/letters/doctype/email_send_recipient/email_send_recipient.json
+msgid "Email Send Recipient"
+msgstr "Destinataire de l'envoi d'e-mail"
+
+#. Label of a Int field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Email Width (px)"
+msgstr "Largeur de l'e-mail (px)"
+
+#. Label of a Int field in DocType 'Email Send'
+#: letters/letters/doctype/email_send/email_send.json
+msgid "Email Width (snapshot)"
+msgstr "Largeur de l'e-mail (instantané)"
+
+#. Label of a Small Text field in DocType 'Email Send Recipient'
+#: letters/letters/doctype/email_send_recipient/email_send_recipient.json
+msgid "Error"
+msgstr "Erreur"
+
+#. Option for the 'Status' (Select) field in DocType 'Email Send'
+#. Option for the 'Status' (Select) field in DocType 'Email Send Recipient'
+#. Option for the 'Status' (Select) field in DocType 'Letter'
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/email_send_recipient/email_send_recipient.json
+#: letters/letters/doctype/letter/letter.json
+msgid "Failed"
+msgstr "Échoué"
+
+#: letters/letters/doctype/letter/letter.js:49
+msgid "Failed to duplicate {0}"
+msgstr "Échec de la duplication de {0}"
+
+#. Label of a Datetime field in DocType 'Email Send Recipient'
+#: letters/letters/doctype/email_send_recipient/email_send_recipient.json
+msgid "First Opened"
+msgstr "Première ouverture"
+
+#. Description of the 'Active' (Check) field in DocType 'Letters Template'
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Inactive templates are hidden from the picker"
+msgstr "Les modèles inactifs sont masqués dans le sélecteur"
+
+#. Label of a Check field in DocType 'Email Send'
+#. Label of a Check field in DocType 'Letter'
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/letter/letter.json
+msgid "Include Unsubscribe Link"
+msgstr "Inclure le lien de désabonnement"
+
+#: letters/letters/api/unsubscribe.py:69
+msgid "Invalid email address."
+msgstr "Adresse e-mail invalide."
+
+#: letters/letters/api/recipients.py:380
+msgid "Invalid source configuration."
+msgstr "Configuration de la source invalide."
+
+#. Label of a Link field in DocType 'Email Send'
+#. Name of a DocType
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/letter/letter.json
+msgid "Letter"
+msgstr "Letter"
+
+#. Name of a DocType
+#: letters/letters/doctype/letter_category/letter_category.json
+msgid "Letter Category"
+msgstr "Catégorie de Letter"
+
+#: letters/letters/doctype/letter/_sending.py:61
+#: letters/letters/doctype/letter/_sending.py:101
+msgid "Letter has no content to send."
+msgstr "La lettre n'a pas de contenu à envoyer."
+
+#: letters/letters/doctype/letter/_sending.py:63
+#: letters/letters/doctype/letter/_sending.py:103
+msgid "Letter has no subject line."
+msgstr "La lettre n'a pas d'objet."
+
+#: letters/letters/overrides/notification.py:30
+msgid ""
+"Letter {0} is already linked to Notification {1}. Each Letter can only be "
+"linked to one Notification."
+msgstr ""
+"La lettre {0} est déjà liée à la notification {1}. Chaque lettre ne peut "
+"être liée qu'à une seule notification."
+
+#. Name of a Workspace
+#: letters/letters/workspace/letters/letters.json
+#: letters/public/frappe_customizations/notification.js:9
+#: letters/public/frappe_customizations/notification.js:30
+msgid "Letters"
+msgstr "Letters"
+
+#. Name of a role
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/letter/letter.json
+#: letters/letters/doctype/letter_category/letter_category.json
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Letters Manager"
+msgstr "Gestionnaire Letters"
+
+#. Name of a DocType
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Letters Template"
+msgstr "Modèle de Letters"
+
+#. Description of the 'Sort Order' (Int) field in DocType 'Letters Template'
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Lower numbers appear first in the picker"
+msgstr "Les valeurs les plus basses apparaissent en premier dans le sélecteur"
+
+#. Name of a role
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/letter/letter.json
+#: letters/letters/doctype/letter_category/letter_category.json
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Marketing Manager"
+msgstr "Responsable marketing"
+
+#: letters/public/frappe_customizations/letter.js:30
+msgid "New Letter"
+msgstr "Nouvelle lettre"
+
+#: letters/letters/api/links.py:246
+msgid "No blocks provided."
+msgstr "Aucun bloc fourni."
+
+#: letters/letters/api/recipients.py:157
+msgid "No recipients found across all selected audience sources."
+msgstr "Aucun destinataire trouvé parmi les sources d'audience sélectionnées."
+
+#: letters/letters/doctype/letter/_sending.py:238
+msgid "No recipients provided."
+msgstr "Aucun destinataire fourni."
+
+#: letters/letters/doctype/letter/_sending.py:230
+msgid "No records match the selected filters."
+msgstr "Aucun enregistrement ne correspond aux filtres sélectionnés."
+
+#: letters/letters/api/sending.py:161
+msgid "No send found for this letter."
+msgstr "Aucun envoi trouvé pour cette lettre."
+
+#: letters/letters/api/recipients.py:385
+msgid "No valid email addresses found in this source."
+msgstr "Aucune adresse e-mail valide trouvée dans cette source."
+
+#: letters/letters/api/recipients.py:161
+#: letters/letters/doctype/letter/_sending.py:250
+msgid "No valid email addresses to send to."
+msgstr "Aucune adresse e-mail valide à qui envoyer."
+
+#: letters/letters/doctype/letter/letter.js:22
+msgid "Open"
+msgstr "Ouvrir"
+
+#. Label of a Int field in DocType 'Email Send Recipient'
+#: letters/letters/doctype/email_send_recipient/email_send_recipient.json
+msgid "Open Count"
+msgstr "Nombre d'ouvertures"
+
+#: letters/public/frappe_customizations/notification.js:7
+msgid "Open Letter"
+msgstr "Ouvrir la lettre"
+
+#: letters/public/frappe_customizations/letter.js:4
+msgid "Open in Letters Builder"
+msgstr "Ouvrir dans Letters Builder"
+
+#: letters/letters/doctype/letter/letter.js:23
+msgid "Open in Letters builder"
+msgstr "Ouvrir dans le générateur Letters"
+
+#. Label of a Check field in DocType 'Email Send Recipient'
+#: letters/letters/doctype/email_send_recipient/email_send_recipient.json
+msgid "Opened"
+msgstr "Ouvert"
+
+#. Description of the 'Thumbnail' (Attach Image) field in DocType 'Letters
+#. Template'
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Optional preview image shown in the template picker"
+msgstr "Image d'aperçu facultative affichée dans le sélecteur de modèles"
+
+#. Option for the 'Status' (Select) field in DocType 'Email Send'
+#. Option for the 'Status' (Select) field in DocType 'Letter'
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/letter/letter.json
+msgid "Partial"
+msgstr "Partiel"
+
+#. Option for the 'Status' (Select) field in DocType 'Email Send Recipient'
+#: letters/letters/doctype/email_send_recipient/email_send_recipient.json
+msgid "Pending"
+msgstr "En attente"
+
+#: letters/public/frappe_customizations/notification.js:13
+msgid "Please save the notification first, then use Design with Letters."
+msgstr ""
+"Veuillez d'abord enregistrer la notification, puis utiliser Concevoir avec "
+"Letters."
+
+#. Label of a Data field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Preview Text"
+msgstr "Texte d'aperçu"
+
+#. Label of a Data field in DocType 'Email Send'
+#: letters/letters/doctype/email_send/email_send.json
+msgid "Preview Text (snapshot)"
+msgstr "Texte d'aperçu (instantané)"
+
+#. Label of a Code field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Recipient Config"
+msgstr "Configuration des destinataires"
+
+#. Label of a Section Break field in DocType 'Email Send'
+#. Label of a Table field in DocType 'Email Send'
+#: letters/letters/doctype/email_send/email_send.json
+msgid "Recipients"
+msgstr "Destinataires"
+
+#. Description of the 'Recipient Config' (Code) field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid ""
+"Saved audience selection (group / pasted list / doctype query) so scheduled "
+"sends and reloads know who to send to"
+msgstr ""
+"Sélection d'audience enregistrée (groupe / liste collée / requête sur un "
+"doctype) afin que les envois programmés et les rechargements sachent à qui "
+"envoyer"
+
+#. Option for the 'Status' (Select) field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Scheduled"
+msgstr "Planifié"
+
+#. Label of a Datetime field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Scheduled At"
+msgstr "Planifié à"
+
+#: letters/letters/doctype/letter/_sending.py:70
+msgid "Scheduled time must be in the future."
+msgstr "L'heure planifiée doit être dans le futur."
+
+#: letters/letters/doctype/letter/letter.js:33
+msgid "Select at least one letter to duplicate."
+msgstr "Sélectionnez au moins une lettre à dupliquer."
+
+#. Label of a Data field in DocType 'Email Send'
+#: letters/letters/doctype/email_send/email_send.json
+msgid "Send Mode"
+msgstr "Mode d'envoi"
+
+#. Label of a Data field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Sender Email"
+msgstr "E-mail de l'expéditeur"
+
+#. Label of a Data field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Sender Name"
+msgstr "Nom de l'expéditeur"
+
+#. Option for the 'Status' (Select) field in DocType 'Email Send'
+#. Option for the 'Status' (Select) field in DocType 'Letter'
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/letter/letter.json
+msgid "Sending"
+msgstr "Envoi en cours"
+
+#. Option for the 'Status' (Select) field in DocType 'Email Send'
+#. Label of a Int field in DocType 'Email Send'
+#. Option for the 'Status' (Select) field in DocType 'Email Send Recipient'
+#. Option for the 'Status' (Select) field in DocType 'Letter'
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/email_send_recipient/email_send_recipient.json
+#: letters/letters/doctype/letter/letter.json
+msgid "Sent"
+msgstr "Envoyé"
+
+#. Label of a Int field in DocType 'Letters Template'
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Sort Order"
+msgstr "Ordre de tri"
+
+#. Label of a Select field in DocType 'Email Send'
+#. Label of a Select field in DocType 'Email Send Recipient'
+#. Label of a Select field in DocType 'Letter'
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/email_send_recipient/email_send_recipient.json
+#: letters/letters/doctype/letter/letter.json
+msgid "Status"
+msgstr "Statut"
+
+#. Description of the 'Blocks JSON' (Code) field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Structured design tree for the visual editor"
+msgstr "Arborescence de conception structurée pour l'éditeur visuel"
+
+#. Label of a Data field in DocType 'Email Send'
+#: letters/letters/doctype/email_send/email_send.json
+msgid "Subject (snapshot)"
+msgstr "Objet (instantané)"
+
+#. Label of a Data field in DocType 'Letter'
+#: letters/letters/doctype/letter/letter.json
+msgid "Subject Line"
+msgstr "Objet"
+
+#. Name of a role
+#: letters/letters/doctype/email_send/email_send.json
+#: letters/letters/doctype/letter/letter.json
+#: letters/letters/doctype/letter_category/letter_category.json
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "System Manager"
+msgstr "Gestionnaire Système"
+
+#: letters/public/frappe_customizations/letter.js:20
+msgid "Templates"
+msgstr "Modèles"
+
+#: letters/letters/doctype/letter/_sending.py:216
+msgid "The selected Email Group has no active subscribers."
+msgstr "Le groupe d'e-mails sélectionné n'a aucun abonné actif."
+
+#: letters/letters/api/recipients.py:164
+#: letters/letters/doctype/letter/_sending.py:253
+msgid ""
+"This audience has more than {0} recipients, which is above the per-letter "
+"limit. Narrow your filters or split the send."
+msgstr ""
+"Cette audience compte plus de {0} destinataires, ce qui dépasse la limite "
+"par lettre. Affinez vos filtres ou scindez l'envoi."
+
+#: letters/letters/doctype/letter/_sending.py:59
+#: letters/letters/doctype/letter/_sending.py:131
+msgid "This letter has already been sent or is currently sending."
+msgstr "Cette lettre a déjà été envoyée ou est en cours d'envoi."
+
+#: letters/letters/api/sending.py:131
+msgid "This letter has already been sent."
+msgstr "Cette lettre a déjà été envoyée."
+
+#: letters/letters/doctype/letter/_sending.py:152
+msgid ""
+"This letter has no saved recipients. Open it and choose an audience before "
+"sending."
+msgstr ""
+"Cette lettre n'a aucun destinataire enregistré. Ouvrez-la et choisissez une "
+"audience avant l'envoi."
+
+#: letters/letters/api/sending.py:133
+msgid "This letter is currently sending."
+msgstr "Cette lettre est en cours d'envoi."
+
+#: letters/letters/api/sending.py:168
+msgid "This letter isn't in a resumable state."
+msgstr "Cette lettre n'est pas dans un état permettant la reprise."
+
+#: letters/letters/api/unsubscribe.py:72
+msgid "This link is invalid or has expired."
+msgstr "Ce lien est invalide ou a expiré."
+
+#: letters/letters/api/sending.py:189
+msgid ""
+"This send has no missing recipients — it may just be slow. Check back "
+"shortly."
+msgstr ""
+"Cet envoi n'a aucun destinataire manquant — il est peut-être simplement "
+"lent. Revenez vérifier sous peu."
+
+#: letters/letters/api/sending.py:171
+msgid ""
+"This send still has background jobs in progress — it's just slow, not stuck."
+" Check back shortly instead of resuming."
+msgstr ""
+"Cet envoi a encore des tâches en arrière-plan en cours — il est simplement "
+"lent, pas bloqué. Revenez vérifier sous peu plutôt que de le reprendre."
+
+#. Label of a Attach Image field in DocType 'Letters Template'
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Thumbnail"
+msgstr "Miniature"
+
+#. Label of a Data field in DocType 'Letter'
+#. Label of a Data field in DocType 'Letters Template'
+#: letters/letters/doctype/letter/letter.json
+#: letters/letters/doctype/letters_template/letters_template.json
+msgid "Title"
+msgstr "Titre"
+
+#. Label of a Int field in DocType 'Email Send'
+#: letters/letters/doctype/email_send/email_send.json
+msgid "Total Recipients"
+msgstr "Total des destinataires"
+
+#: letters/letters/api/sending.py:449
+msgid "Unsubscribe"
+msgstr "Se désabonner"
+
+#: letters/letters/doctype/letter/_sending.py:224
+msgid "doctype_config must include doctype and email_field."
+msgstr "doctype_config doit inclure doctype et email_field."
+
+#: letters/letters/doctype/letter/_sending.py:35
+msgid "{0} is not a valid email address."
+msgstr "{0} n'est pas une adresse e-mail valide."
+
+#: letters/letters/doctype/letter/letter.js:52
+msgid "{0} letter(s) duplicated."
+msgstr "{0} lettre(s) dupliquée(s)."
