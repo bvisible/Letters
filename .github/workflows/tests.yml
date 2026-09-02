@@ -25,5 +25,8 @@ jobs:
       app: letters
       install_apps: ""
       test_args: ${{ inputs.test_args || '' }}
+      # api_mock_tests.py is a pytest-only mock suite (renamed out of test_* so the
+      # bench runner never imports it); run it here, informative + non-blocking.
+      pytest_paths: letters/tests/api_mock_tests.py
     # inherit: CI_REPORT_SECRET + FLEET_READ_TOKEN (private bvisible deps)
     secrets: inherit
