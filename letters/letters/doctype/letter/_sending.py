@@ -30,6 +30,11 @@ class SendingMixin:
             subj = neutralize_unresolved_merge_tags(resolve_merge_tags_for_preview(subj, self.name))
 
         requested = (recipient or "").strip()
+        # A test email may only go to the signed-in user's own address, never an
+        # arbitrary recipient: otherwise "send a test" is an open relay for spam
+        # or phishing through the platform.
+        if requested and requested != frappe.session.user:
+            frappe.throw(_("A test email can only be sent to your own address ({0}).").format(frappe.session.user))
         email = requested or frappe.session.user
         if not frappe.utils.validate_email_address(email, throw=False):
             frappe.throw(_("{0} is not a valid email address.").format(email))
@@ -39,14 +44,10 @@ class SendingMixin:
             subject=f"[TEST] {subj or 'Email Preview'}",
             message=html,
             now=False,
-            # Our compiler already produces a complete, inline-styled HTML doc.
-            # raw_html keeps it intact (our <style> stays in <head>, where Gmail
-            # reads media queries — Frappe's default wrapper moves it into <body>,
-            # so Gmail ignores it). add_css skips Frappe's email CSS, which made
-            # Gmail drop all embedded styles. Both are needed for the responsive
-            # layout to survive to Gmail. See email_compiler.
-            add_css=False,
-            raw_html=True,
+            # NOTE: frappe.sendmail has no add_css/raw_html params (neither our fork
+            # nor upstream) — passing them raised TypeError on every real send. The
+            # message goes through Frappe's standard formatting; preserving <style>
+            # in <head> for Gmail media queries is a separate open item.
         )
         return {"sent_to": email}
 

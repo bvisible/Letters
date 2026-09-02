@@ -49,7 +49,11 @@ def send_test(blocks: str | None = None, subject: str | None = None, preview_tex
     html = neutralize_unresolved_merge_tags(html)
     subject = neutralize_unresolved_merge_tags(subject) if subject else subject
 
-    email = (recipient or "").strip() or frappe.session.user
+    requested = (recipient or "").strip()
+    # Same rule as Letter.send_test_email: a test email only goes to the caller.
+    if requested and requested != frappe.session.user:
+        frappe.throw(_("A test email can only be sent to your own address ({0}).").format(frappe.session.user))
+    email = requested or frappe.session.user
     if not frappe.utils.validate_email_address(email, throw=False):
         frappe.throw(_("'{0}' is not a valid email address.").format(email))
 
@@ -58,8 +62,6 @@ def send_test(blocks: str | None = None, subject: str | None = None, preview_tex
         subject=f"[TEST] {subject or 'Email Preview'}",
         message=html,
         now=False,
-        add_css=False,    # skip Frappe's email CSS (Gmail drops all styles on it)
-        raw_html=True,    # send our complete HTML as-is; keeps <style> in <head>
     )
     return {"sent_to": email}
 
@@ -439,8 +441,6 @@ def _queue_recipients(send_doc, letter_name, emails, subject, html):
         sender=sender,
         message=html,
         now=False,
-        add_css=False,    # skip Frappe's email CSS (Gmail drops all styles on it)
-        raw_html=True,    # send our complete HTML as-is; keeps <style> in <head>
         queue_separately=True,
         send_priority=0,
         reference_doctype="Letter",

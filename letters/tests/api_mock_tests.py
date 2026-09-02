@@ -3,7 +3,7 @@ Tests for letters/letters/api.py
 
 All Frappe framework calls are mocked via unittest.mock so no bench is needed.
 
-Run with:  pytest letters/tests/test_api.py -v
+Run with:  pytest letters/tests/api_mock_tests.py -v
 """
 from __future__ import annotations
 
