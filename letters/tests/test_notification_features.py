@@ -19,12 +19,12 @@ import json
 from unittest.mock import MagicMock, patch, call
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 SAMPLE_BLOCKS = json.dumps([{"type": "text", "props": {"html_content": "<p>Hi</p>"}}])
 
 
-class NotificationFeaturesTestCase(IntegrationTestCase):
+class NotificationFeaturesTestCase(FrappeTestCase):
     """Base with shared helpers and cleanup."""
 
     def setUp(self):
@@ -240,7 +240,7 @@ class TestLettersNotificationSendRouting(NotificationFeaturesTestCase):
 # Letter DocType metadata
 # ---------------------------------------------------------------------------
 
-class TestLetterDoctypeMeta(IntegrationTestCase):
+class TestLetterDoctypeMeta(FrappeTestCase):
 
     def test_show_title_field_in_link(self):
         meta = frappe.get_meta("Letter")

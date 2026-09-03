@@ -12,7 +12,7 @@ import json
 from unittest.mock import patch
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from letters.letters.doctype.letter._content import _unique_letter_title
 
@@ -29,7 +29,7 @@ SAMPLE_RECIPIENT_CONFIG = json.dumps({"type": "paste", "recipients": ["a@example
 # Base test case — explicit cleanup so tests are safe on a real site
 # ---------------------------------------------------------------------------
 
-class LettersTestCase(IntegrationTestCase):
+class LettersTestCase(FrappeTestCase):
     def setUp(self):
         super().setUp()
         self._created = []  # (doctype, name) pairs deleted in tearDown in reverse order
