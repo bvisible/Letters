@@ -19,7 +19,7 @@ frappe.listview_settings["Letter"] = {
 
   button: {
     show(doc) { return true; },
-    get_label() { return __("Open"); },
+    get_label() { return __("Open", null, "Action"); },
     get_description(doc) { return __("Open in Letters builder"); },
     action(doc) {
       frappe.set_route("letter-builder", doc.name);
