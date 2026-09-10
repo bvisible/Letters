@@ -185,10 +185,13 @@ msgstr "Adresse e-mail invalide."
 msgid "Invalid source configuration."
 msgstr "Configuration de la source invalide."
 
+# no opinion on purpose: repeating the source erases the translation another
+# app ships (neoffice-maintenance#335)
 #. Label of a Link field in DocType 'Email Send'
 #. Name of a DocType
 #: letters/letters/doctype/email_send/email_send.json
 #: letters/letters/doctype/letter/letter.json
+#, fuzzy
 msgid "Letter"
 msgstr "Letter"
 
