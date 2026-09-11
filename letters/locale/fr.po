@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Letters VERSION\n"
 "Report-Msgid-Bugs-To: palkan@frappe.io\n"
-"POT-Creation-Date: 2026-09-10 03:27+0000\n"
+"POT-Creation-Date: 2026-09-11 03:26+0000\n"
 "PO-Revision-Date: 2026-07-10 18:13+0034\n"
 "Last-Translator: palkan@frappe.io\n"
 "Language-Team: palkan@frappe.io\n"
@@ -284,10 +284,8 @@ msgstr "Aucune adresse e-mail valide trouvée dans cette source."
 msgid "No valid email addresses to send to."
 msgstr "Aucune adresse e-mail valide à qui envoyer."
 
-# released: this app means the verb and claims Open:Action; the bare msgid
-# belongs to the nine apps that mean the state (#335)
 #: letters/letters/doctype/letter/letter.js:22
-#, fuzzy
+msgctxt "Action"
 msgid "Open"
 msgstr "Ouvrir"
 
@@ -549,7 +547,3 @@ msgstr "{0} n'est pas une adresse e-mail valide."
 #: letters/letters/doctype/letter/letter.js:52
 msgid "{0} letter(s) duplicated."
 msgstr "{0} lettre(s) dupliquée(s)."
-
-msgctxt "Action"
-msgid "Open"
-msgstr "Ouvrir"
