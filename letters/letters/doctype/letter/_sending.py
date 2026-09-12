@@ -29,13 +29,11 @@ class SendingMixin:
         if subj:
             subj = neutralize_unresolved_merge_tags(resolve_merge_tags_for_preview(subj, self.name))
 
-        requested = (recipient or "").strip()
-        # A test email may only go to the signed-in user's own address, never an
-        # arbitrary recipient: otherwise "send a test" is an open relay for spam
-        # or phishing through the platform.
-        if requested and requested != frappe.session.user:
-            frappe.throw(_("A test email can only be sent to your own address ({0}).").format(frappe.session.user))
-        email = requested or frappe.session.user
+        # Any valid recipient, not only the signed-in user: the test dialog lets the author
+        # send the proof to a colleague or a client (af8e227). Who may send at all is gated
+        # by the Letter read permission above, held by the same roles that send whole
+        # campaigns, so this is no open relay (neoffice-maintenance#397).
+        email = (recipient or "").strip() or frappe.session.user
         if not frappe.utils.validate_email_address(email, throw=False):
             frappe.throw(_("{0} is not a valid email address.").format(email))
 

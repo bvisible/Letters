@@ -572,12 +572,29 @@ class TestSendTestEmail(LettersTestCase):
         self.assertIn("[TEST]", kw.get("subject", ""))
         self.assertIn("My Letter", kw.get("subject", ""))
 
-    def test_rejects_recipient_not_matching_session_user(self):
+    def test_sends_to_a_recipient_other_than_the_session_user(self):
+        # The test dialog's recipient is editable on purpose (af8e227): a proof goes to a
+        # colleague or a client. 533be34 had put the "own address only" rule back to satisfy
+        # the test this one replaces, which predated af8e227 (neoffice-maintenance#397).
         doc = self.new_letter()
         frappe.set_user("Administrator")
-        with patch("frappe.utils.validate_email_address", return_value="admin@example.com"):
-            with self.assertRaises(frappe.ValidationError):
-                doc.send_test_email(recipient="someone.else@example.com")
+        with patch("frappe.sendmail") as mock_sendmail, \
+             patch("frappe.utils.validate_email_address", return_value="relecture@yopmail.com"):
+            result = doc.send_test_email(recipient="relecture@yopmail.com")
+        self.assertEqual(result["sent_to"], "relecture@yopmail.com")
+        self.assertEqual(mock_sendmail.call_args.kwargs["recipients"], ["relecture@yopmail.com"])
+
+    def test_a_user_without_letter_access_cannot_send_a_test(self):
+        # What does gate the test send: the Letter read permission.
+        doc = self.new_letter()
+        frappe.set_user("Guest")
+        try:
+            with patch("frappe.sendmail") as mock_sendmail:
+                with self.assertRaises(frappe.PermissionError):
+                    doc.send_test_email(recipient="relecture@yopmail.com")
+            mock_sendmail.assert_not_called()
+        finally:
+            frappe.set_user("Administrator")
 
 
 # ---------------------------------------------------------------------------
