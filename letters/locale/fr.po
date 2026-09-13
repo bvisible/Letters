@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Letters VERSION\n"
 "Report-Msgid-Bugs-To: palkan@frappe.io\n"
-"POT-Creation-Date: 2026-09-12 03:25+0000\n"
+"POT-Creation-Date: 2026-09-13 03:27+0000\n"
 "PO-Revision-Date: 2026-07-10 18:13+0034\n"
 "Last-Translator: palkan@frappe.io\n"
 "Language-Team: palkan@frappe.io\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.13.1\n"
 
-#: letters/letters/api/sending.py:58
+#: letters/letters/api/sending.py:57
 msgid "'{0}' is not a valid email address."
 msgstr "« {0} » n'est pas une adresse e-mail valide."
 
@@ -26,18 +26,12 @@ msgstr "« {0} » n'est pas une adresse e-mail valide."
 msgid "A template named {0} already exists"
 msgstr "Un modèle nommé {0} existe déjà"
 
-#: letters/letters/api/sending.py:55
-#: letters/letters/doctype/letter/_sending.py:37
-msgid "A test email can only be sent to your own address ({0})."
-msgstr ""
-"Un e-mail de test ne peut être envoyé qu'à votre propre adresse ({0})."
-
 #. Label of a Check field in DocType 'Letters Template'
 #: letters/letters/doctype/letters_template/letters_template.json
 msgid "Active"
 msgstr "Actif"
 
-#: letters/letters/doctype/letter/_sending.py:247
+#: letters/letters/doctype/letter/_sending.py:245
 msgid "All selected recipients have unsubscribed from this letter."
 msgstr ""
 "Tous les destinataires sélectionnés se sont désabonnés de cette lettre."
@@ -80,7 +74,7 @@ msgstr "Catégorie"
 msgid "Category Name"
 msgstr "Nom de la catégorie"
 
-#: letters/letters/doctype/letter/_sending.py:67
+#: letters/letters/doctype/letter/_sending.py:65
 msgid "Choose recipients before scheduling this letter."
 msgstr "Choisissez les destinataires avant de planifier cette lettre."
 
@@ -200,13 +194,13 @@ msgstr "Letter"
 msgid "Letter Category"
 msgstr "Catégorie de Letter"
 
-#: letters/letters/doctype/letter/_sending.py:62
-#: letters/letters/doctype/letter/_sending.py:102
+#: letters/letters/doctype/letter/_sending.py:60
+#: letters/letters/doctype/letter/_sending.py:100
 msgid "Letter has no content to send."
 msgstr "La lettre n'a pas de contenu à envoyer."
 
-#: letters/letters/doctype/letter/_sending.py:64
-#: letters/letters/doctype/letter/_sending.py:104
+#: letters/letters/doctype/letter/_sending.py:62
+#: letters/letters/doctype/letter/_sending.py:102
 msgid "Letter has no subject line."
 msgstr "La lettre n'a pas d'objet."
 
@@ -263,15 +257,15 @@ msgstr "Aucun bloc fourni."
 msgid "No recipients found across all selected audience sources."
 msgstr "Aucun destinataire trouvé parmi les sources d'audience sélectionnées."
 
-#: letters/letters/doctype/letter/_sending.py:239
+#: letters/letters/doctype/letter/_sending.py:237
 msgid "No recipients provided."
 msgstr "Aucun destinataire fourni."
 
-#: letters/letters/doctype/letter/_sending.py:231
+#: letters/letters/doctype/letter/_sending.py:229
 msgid "No records match the selected filters."
 msgstr "Aucun enregistrement ne correspond aux filtres sélectionnés."
 
-#: letters/letters/api/sending.py:163
+#: letters/letters/api/sending.py:162
 msgid "No send found for this letter."
 msgstr "Aucun envoi trouvé pour cette lettre."
 
@@ -280,7 +274,7 @@ msgid "No valid email addresses found in this source."
 msgstr "Aucune adresse e-mail valide trouvée dans cette source."
 
 #: letters/letters/api/recipients.py:161
-#: letters/letters/doctype/letter/_sending.py:251
+#: letters/letters/doctype/letter/_sending.py:249
 msgid "No valid email addresses to send to."
 msgstr "Aucune adresse e-mail valide à qui envoyer."
 
@@ -376,7 +370,7 @@ msgstr "Planifié"
 msgid "Scheduled At"
 msgstr "Planifié à"
 
-#: letters/letters/doctype/letter/_sending.py:71
+#: letters/letters/doctype/letter/_sending.py:69
 msgid "Scheduled time must be in the future."
 msgstr "L'heure planifiée doit être dans le futur."
 
@@ -457,12 +451,12 @@ msgstr "Gestionnaire Système"
 msgid "Templates"
 msgstr "Modèles"
 
-#: letters/letters/doctype/letter/_sending.py:217
+#: letters/letters/doctype/letter/_sending.py:215
 msgid "The selected Email Group has no active subscribers."
 msgstr "Le groupe d'e-mails sélectionné n'a aucun abonné actif."
 
 #: letters/letters/api/recipients.py:164
-#: letters/letters/doctype/letter/_sending.py:254
+#: letters/letters/doctype/letter/_sending.py:252
 msgid ""
 "This audience has more than {0} recipients, which is above the per-letter "
 "limit. Narrow your filters or split the send."
@@ -470,16 +464,16 @@ msgstr ""
 "Cette audience compte plus de {0} destinataires, ce qui dépasse la limite "
 "par lettre. Affinez vos filtres ou scindez l'envoi."
 
-#: letters/letters/doctype/letter/_sending.py:60
-#: letters/letters/doctype/letter/_sending.py:132
+#: letters/letters/doctype/letter/_sending.py:58
+#: letters/letters/doctype/letter/_sending.py:130
 msgid "This letter has already been sent or is currently sending."
 msgstr "Cette lettre a déjà été envoyée ou est en cours d'envoi."
 
-#: letters/letters/api/sending.py:133
+#: letters/letters/api/sending.py:132
 msgid "This letter has already been sent."
 msgstr "Cette lettre a déjà été envoyée."
 
-#: letters/letters/doctype/letter/_sending.py:153
+#: letters/letters/doctype/letter/_sending.py:151
 msgid ""
 "This letter has no saved recipients. Open it and choose an audience before "
 "sending."
@@ -487,11 +481,11 @@ msgstr ""
 "Cette lettre n'a aucun destinataire enregistré. Ouvrez-la et choisissez une "
 "audience avant l'envoi."
 
-#: letters/letters/api/sending.py:135
+#: letters/letters/api/sending.py:134
 msgid "This letter is currently sending."
 msgstr "Cette lettre est en cours d'envoi."
 
-#: letters/letters/api/sending.py:170
+#: letters/letters/api/sending.py:169
 msgid "This letter isn't in a resumable state."
 msgstr "Cette lettre n'est pas dans un état permettant la reprise."
 
@@ -499,7 +493,7 @@ msgstr "Cette lettre n'est pas dans un état permettant la reprise."
 msgid "This link is invalid or has expired."
 msgstr "Ce lien est invalide ou a expiré."
 
-#: letters/letters/api/sending.py:191
+#: letters/letters/api/sending.py:190
 msgid ""
 "This send has no missing recipients — it may just be slow. Check back "
 "shortly."
@@ -507,7 +501,7 @@ msgstr ""
 "Cet envoi n'a aucun destinataire manquant — il est peut-être simplement "
 "lent. Revenez vérifier sous peu."
 
-#: letters/letters/api/sending.py:173
+#: letters/letters/api/sending.py:172
 msgid ""
 "This send still has background jobs in progress — it's just slow, not stuck."
 " Check back shortly instead of resuming."
@@ -532,15 +526,15 @@ msgstr "Titre"
 msgid "Total Recipients"
 msgstr "Total des destinataires"
 
-#: letters/letters/api/sending.py:449
+#: letters/letters/api/sending.py:448
 msgid "Unsubscribe"
 msgstr "Se désabonner"
 
-#: letters/letters/doctype/letter/_sending.py:225
+#: letters/letters/doctype/letter/_sending.py:223
 msgid "doctype_config must include doctype and email_field."
 msgstr "doctype_config doit inclure doctype et email_field."
 
-#: letters/letters/doctype/letter/_sending.py:40
+#: letters/letters/doctype/letter/_sending.py:38
 msgid "{0} is not a valid email address."
 msgstr "{0} n'est pas une adresse e-mail valide."
 
