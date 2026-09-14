@@ -13,6 +13,9 @@ jobs:
     with:
       app: letters
       install_apps: ""
+      # Same pytest pass as tests.yml: the mirror check fails the preview on any input
+      # that differs, since a preview that differs measures its own gap, not upstream's.
+      pytest_paths: letters/tests/api_mock_tests.py
       upstream_preview: true
     # inherit: CI_REPORT_SECRET + FLEET_READ_TOKEN (private bvisible deps such as neoffice_theme)
     secrets: inherit
