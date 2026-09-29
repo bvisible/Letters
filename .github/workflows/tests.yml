@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   ci:
-    uses: bvisible/neoffice-ci/.github/workflows/frappe-app-ci.yml@main
+    uses: bvisible/neoffice-ci/.github/workflows/frappe-app-ci.yml@fix/720-client-names-shallow
     with:
       app: letters
       install_apps: ""
