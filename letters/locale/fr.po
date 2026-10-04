@@ -94,7 +94,10 @@ msgstr "Concevoir avec Letters"
 msgid "Draft"
 msgstr "Brouillon"
 
-#: letters/letters/doctype/letter/letter.js:30
+# //// Neoffice — context "Action": the bare key is the bank-transaction status "Doublon" in
+# the merged dictionary (that app loads last); this is the list-menu verb.
+#: letters/letters/doctype/letter/letter.js:34
+msgctxt "Action"
 msgid "Duplicate"
 msgstr "Dupliquer"
 

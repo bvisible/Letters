@@ -27,7 +27,11 @@ frappe.listview_settings["Letter"] = {
   },
 
   onload(listview) {
-    listview.page.add_action_item(__("Duplicate"), async () => {
+    //// Neoffice — the "Action" context keeps this verb apart from the bare key "Duplicate".
+    //// The bank-transaction app translates that bare key as the noun "Doublon" (a duplicated
+    //// transaction), and its catalogue loads last, so without a context the list menu read
+    //// "Doublon" instead of "Dupliquer". Drop it when the bare key is no longer ambiguous.
+    listview.page.add_action_item(__("Duplicate", null, "Action"), async () => {
       const selected = listview.get_checked_items();
       if (!selected.length) {
         frappe.msgprint(__("Select at least one letter to duplicate."));
