@@ -46,3 +46,9 @@ override_doctype_class = {
 permission_query_conditions = {
     "Letter": "letters.letters.doctype.letter.letter.get_permission_query_conditions",
 }
+
+# //// Neoffice — the unsubscribe page of a letter (/letters_unsubscribe?email=…, the link of every mailing) stays open
+# //// while the website is in maintenance (Website Profile maintenance_mode, an instance without a showcase site): a
+# //// recipient must always be able to leave the list. Read by frappe/website/path_resolver.py
+# //// (website_route_stays_open, neoffice-maintenance#2171).
+website_maintenance_open_routes = ["letters_unsubscribe"]
