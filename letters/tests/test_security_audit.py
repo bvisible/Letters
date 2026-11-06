@@ -214,6 +214,26 @@ class LettersSecurityAudit(FrappeTestCase):
             decorators = src[max(0, idx - 400):idx]
             self.assertIn('methods=["POST"]', decorators, f"{fn} must be POST-only")
 
+    # ── F3: the builder Preview writes the email into a sandboxed frame (no allow-scripts) ──
+    def test_preview_iframe_is_sandboxed_without_scripts(self):
+        import os
+        import re
+
+        app = frappe.get_app_path("letters")
+        # The Vue source and the committed bundle the desk actually loads (page_js) must agree.
+        for path in (
+            os.path.join(app, "..", "frontend", "src", "composables", "usePreview.js"),
+            os.path.join(app, "public", "js", "letter-builder.js"),
+        ):
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
+            tags = re.findall(r'<iframe id="__preview-frame"[^>]*>', text)
+            self.assertEqual(len(tags), 1, path)
+            sandbox = re.search(r'sandbox="([^"]*)"', tags[0])
+            self.assertIsNotNone(sandbox, f"preview iframe is not sandboxed in {path}")
+            self.assertIn("allow-same-origin", sandbox.group(1))
+            self.assertNotIn("allow-scripts", sandbox.group(1))
+
     # ── F2 / F10: the guest unsubscribe page escapes every reflected/stored value ─────────
     def test_unsubscribe_page_escapes_reflected_values(self):
         path = frappe.get_app_path("letters", "www", "letters_unsubscribe.html")

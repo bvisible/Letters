@@ -337,7 +337,8 @@ table.email-card>tbody>tr>td{font-size:0!important;line-height:0!important;}
 </head>
 <body>
 <div id="__preview-stage">
-  <iframe id="__preview-frame" title="Email preview"></iframe>
+  <!-- //// Neoffice — security audit (neoffice-maintenance#2296): sandbox the email, no allow-scripts. A Custom HTML block is raw author HTML and this same-origin frame ran its scripts in the previewer's desk session; an inbox never runs scripts, so nothing legitimate is lost. allow-popups keeps target=_blank links opening in a normal tab. -->
+  <iframe id="__preview-frame" title="Email preview" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
 </div>
 <div id="__preview-toolbar">
   <span>${c}</span>
