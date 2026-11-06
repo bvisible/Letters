@@ -5,7 +5,13 @@ import json
 import frappe
 from frappe import _
 # //// Neoffice — security audit (neoffice-maintenance#2296): rate-limit the link-check endpoints.
-from frappe.rate_limiter import rate_limit
+# //// Fall back to a pass-through decorator when frappe.rate_limiter is absent (the pytest mock
+# //// suite stubs `frappe` as a non-package); real Frappe always provides the real decorator.
+try:
+    from frappe.rate_limiter import rate_limit
+except Exception:
+    def rate_limit(*args, **kwargs):
+        return lambda fn: fn
 
 
 
