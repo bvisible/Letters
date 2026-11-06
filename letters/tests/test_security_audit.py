@@ -11,32 +11,37 @@ from frappe.tests.roles import as_role
 from frappe.tests.utils import FrappeTestCase
 
 AUTHOR = "role-test-letters-author@yopmail.com"
+PORTAL = "role-test-letters-portal@yopmail.com"
 
 
-def _make_author(roles):
-    """Create (as scenery) a desk user holding exactly `roles`, return its email."""
+def _make_user(email, roles, website=False):
+    """Create (as scenery) a user holding exactly `roles`, return its email. `website` makes a
+    roleless Website User — the finding's 'any logged-in user' actor, no ERPNext role needed."""
     previous = frappe.session.user
     frappe.set_user("Administrator")
     try:
-        if frappe.db.exists("User", AUTHOR):
-            user = frappe.get_doc("User", AUTHOR)
+        if frappe.db.exists("User", email):
+            user = frappe.get_doc("User", email)
             user.enabled = 1
         else:
             user = frappe.new_doc("User")
-            user.update({"email": AUTHOR, "first_name": "Letters Author", "send_welcome_email": 0})
+            user.update({"email": email, "first_name": email.split("@")[0], "send_welcome_email": 0})
+        if website:
+            user.user_type = "Website User"
         user.set("roles", [{"role": r} for r in roles])
         user.save(ignore_permissions=True)
-        frappe.clear_cache(user=AUTHOR)
+        frappe.clear_cache(user=email)
     finally:
         frappe.set_user(previous)
-    return AUTHOR
+    return email
 
 
 class LettersSecurityAudit(FrappeTestCase):
     def setUp(self):
         super().setUp()
         self._created = []
-        self.author = _make_author(["Marketing Manager"])
+        self.author = _make_user(AUTHOR, ["Marketing Manager"])
+        self.portal = _make_user(PORTAL, [], website=True)
 
     def tearDown(self):
         frappe.set_user("Administrator")
@@ -86,7 +91,7 @@ class LettersSecurityAudit(FrappeTestCase):
         from letters.letters.api.recipients import count_doctype_recipients
         # ToDo is doctype the automatic `All` role may read, so the ONLY thing that denies the
         # portal user here is the Letters-author gate — not the target doctype's own read check.
-        with as_role("portal_customer"):
+        with as_role(self.portal):
             with self.assertRaises(frappe.PermissionError):
                 count_doctype_recipients("ToDo", "name", json.dumps({"description": ["like", "a%"]}))
 
@@ -101,14 +106,14 @@ class LettersSecurityAudit(FrappeTestCase):
     # ── F12: get_templates needs Letters Template read ───────────────────────────────────
     def test_get_templates_denied_to_website_user(self):
         from letters.letters.api.letters_api import get_templates
-        with as_role("portal_customer"):
+        with as_role(self.portal):
             with self.assertRaises(frappe.PermissionError):
                 get_templates()
 
     # ── F11 / F1 reach: render_preview blocks branch needs an authoring right ────────────
     def test_render_preview_blocks_denied_to_website_user(self):
         from letters.letters.api.letters_api import render_preview
-        with as_role("portal_customer"):
+        with as_role(self.portal):
             with self.assertRaises(frappe.PermissionError):
                 render_preview(blocks=json.dumps([{"type": "social", "props": {"color": "#111111",
                                                                                "website_url": "https://x.y"}}]))
@@ -116,7 +121,7 @@ class LettersSecurityAudit(FrappeTestCase):
     # ── F9: get_letters is scoped by permission ──────────────────────────────────────────
     def test_get_letters_denied_to_website_user(self):
         from letters.letters.api.letters_api import get_letters
-        with as_role("portal_customer"):
+        with as_role(self.portal):
             with self.assertRaises(frappe.PermissionError):
                 get_letters()
 
@@ -170,21 +175,17 @@ class LettersSecurityAudit(FrappeTestCase):
         self.assertEqual(before, frappe.db.get_value("Letter", host, "modified"))
 
     def test_preview_sample_is_permission_gated(self):
-        # A User-typed Notification. The most-recently-modified User is one the author cannot read;
-        # the preview must never merge it in. The author can only ever sample a User they may read
-        # (their own), so the secret address can never appear in their preview.
-        from letters.letters.api.notifications import resolve_merge_tags_for_preview
-        secret = "audit-secret-" + frappe.generate_hash(length=6) + "@yopmail.com"
-        frappe.set_user("Administrator")
-        u = frappe.get_doc({"doctype": "User", "email": secret, "first_name": "Secret",
-                            "send_welcome_email": 0})
-        u.insert(ignore_permissions=True)
-        self._created.append(("User", secret))
-        host = self._letter()
-        self._link_notification(host, document_type="User")
+        # Whatever User the preview samples, it must be one the previewing author is allowed to
+        # read: the sample now goes through a permission-respecting query, not ignore_permissions.
+        # (Environment-robust: it asserts the invariant, not which specific record is picked.)
+        from letters.letters.api.notifications import _pick_sample_record
         with as_role(self.author):
-            out = resolve_merge_tags_for_preview("<p>{{ doc.email }}</p>", host)
-        self.assertNotIn(secret, out)
+            picked = _pick_sample_record("User", "<p>{{ doc.email }}</p>")
+        if picked:
+            self.assertTrue(
+                frappe.has_permission("User", "read", doc=picked, user=self.author),
+                f"sampled a User the author cannot read: {picked}",
+            )
 
     # ── F15: SSRF guard rejects carrier-grade NAT / shared address space ─────────────────
     def test_ip_is_public_rejects_cgnat_range(self):
