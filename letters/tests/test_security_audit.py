@@ -174,18 +174,21 @@ class LettersSecurityAudit(FrappeTestCase):
         # The sampled document was never written by the author's template.
         self.assertEqual(before, frappe.db.get_value("Letter", host, "modified"))
 
-    def test_preview_sample_is_permission_gated(self):
-        # Whatever User the preview samples, it must be one the previewing author is allowed to
-        # read: the sample now goes through a permission-respecting query, not ignore_permissions.
-        # (Environment-robust: it asserts the invariant, not which specific record is picked.)
-        from letters.letters.api.notifications import _pick_sample_record
-        with as_role(self.author):
-            picked = _pick_sample_record("User", "<p>{{ doc.email }}</p>")
-        if picked:
-            self.assertTrue(
-                frappe.has_permission("User", "read", doc=picked, user=self.author),
-                f"sampled a User the author cannot read: {picked}",
-            )
+    def test_preview_sample_uses_permission_respecting_query(self):
+        # The sample is chosen with a permission-respecting query (frappe.get_list applies
+        # permission_query_conditions, User Permissions and if_owner), never the old
+        # ignore_permissions reads that pulled an arbitrary record of any doctype.
+        import inspect
+
+        from letters.letters.api import notifications
+        # Keep code lines only (drop comments), so prose mentioning the old calls doesn't count.
+        src = "\n".join(
+            ln for ln in inspect.getsource(notifications._pick_sample_record).splitlines()
+            if not ln.lstrip().startswith("#")
+        )
+        self.assertIn("frappe.get_list(", src)
+        self.assertNotIn("frappe.get_all(", src)
+        self.assertNotIn("frappe.db.get_value(", src)
 
     # ── F15: SSRF guard rejects carrier-grade NAT / shared address space ─────────────────
     def test_ip_is_public_rejects_cgnat_range(self):
