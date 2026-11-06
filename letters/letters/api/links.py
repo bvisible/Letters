@@ -4,6 +4,8 @@ import json
 
 import frappe
 from frappe import _
+# //// Neoffice — security audit (neoffice-maintenance#2296): rate-limit the link-check endpoints.
+from frappe.rate_limiter import rate_limit
 
 
 
@@ -29,7 +31,10 @@ def _ip_is_public(ip):
     """True only for globally-routable unicast addresses. Rejects private,
     loopback, link-local (incl. 169.254.0.0/16 cloud metadata), multicast,
     reserved, and unspecified ranges (IPv4 and IPv6)."""
-    return not (
+    # //// Neoffice — security audit (neoffice-maintenance#2296): also require is_global. The explicit
+    # //// flags missed 100.64.0.0/10 (RFC 6598 carrier-grade NAT / shared address space), which is
+    # //// neither is_private nor is_reserved but reaches hosts on a Tailscale or CGNAT overlay.
+    return ip.is_global and not (
         ip.is_private
         or ip.is_loopback
         or ip.is_link_local
@@ -252,7 +257,10 @@ def _resolve_link_check_args(blocks, name):
 
 
 
+# //// Neoffice — security audit (neoffice-maintenance#2296): each call fans out server-side HEAD
+# //// probes on the web worker; cap how often one caller can trigger that work.
 @frappe.whitelist(methods=["GET", "POST"])
+@rate_limit(key="letters_link_check", limit=30, seconds=60)
 def check_links(blocks: str | None = None, name: str | None = None):
     """Synchronous link check (used by tests and the CLI). Prefer
     start_link_check / get_link_check_result in the UI to avoid tying
@@ -263,7 +271,10 @@ def check_links(blocks: str | None = None, name: str | None = None):
 
 
 
+# //// Neoffice — security audit (neoffice-maintenance#2296): cap how often one caller can enqueue a
+# //// link-check job onto the shared `short` queue (each job resolves many URLs serially).
 @frappe.whitelist(methods=["POST"])
+@rate_limit(key="letters_link_check", limit=30, seconds=60)
 def start_link_check(blocks: str | None = None, name: str | None = None):
     """Enqueue a background link check and return a job key the caller
     can poll with get_link_check_result. The result is cached for 5 min."""

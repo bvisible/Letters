@@ -50,7 +50,10 @@
     <div class="lu-hdr">
       <h1>Email preferences</h1>
       {% if email %}
-      <p>Managing preferences for <strong>{{ email }}</strong></p>
+      {# //// Neoffice — security audit (neoffice-maintenance#2296): escape the reflected query param.
+         Frappe's website Jinja has no autoescape, so an unescaped email/letter/token/category value
+         was reflected XSS on this guest page (reachable even during website maintenance, #2171). #}
+      <p>Managing preferences for <strong>{{ email | e }}</strong></p>
       {% endif %}
     </div>
 
@@ -65,15 +68,19 @@
     <p style="font-size:13.5px;color:#8d99a6;">No email address provided. Please use the unsubscribe link from a received email.</p>
     {% else %}
 
-    <form id="lu-form">
+    {# //// Neoffice — security audit (neoffice-maintenance#2296): carry email/letter/token/csrf as
+       HTML-escaped data-* attributes, read by the script via dataset, instead of interpolating them
+       into inline-script string literals (which an injected closing script tag could break out of). #}
+    <form id="lu-form" data-csrf="{{ csrf_token | e }}" data-email="{{ email | e }}" data-letter="{{ letter | e }}" data-token="{{ token | e }}">
       {% if folders %}
       <div class="lu-section">
         <div class="lu-section-label">Categories <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:#c0c9d6;">— check to unsubscribe</span></div>
         <div class="lu-card">
           {% for folder in folders %}
+          {# //// Neoffice — security audit #2296: escape the category name/label; a double quote in the name broke out of value="" (stored XSS). #}
           <label class="lu-row">
-            <input type="checkbox" class="lu-cb" name="cat" value="{{ folder.name }}" {% if folder.is_unsubscribed %}checked{% endif %}>
-            <span class="lu-row-text">{{ folder.folder_name }}</span>
+            <input type="checkbox" class="lu-cb" name="cat" value="{{ folder.name | e }}" {% if folder.is_unsubscribed %}checked{% endif %}>
+            <span class="lu-row-text">{{ folder.folder_name | e }}</span>
             {% if folder.is_unsubscribed %}
             <span class="lu-row-badge">Unsubscribed</span>
             {% endif %}
@@ -103,10 +110,15 @@
 
     <script>
     (function () {
-      var CSRF = '{{ csrf_token }}';
-      var EMAIL = '{{ email | replace("'", "\\'") }}';
-      var LETTER = '{{ letter | replace("'", "\\'") }}';
-      var TOKEN = '{{ token | replace("'", "\\'") }}';
+      // //// Neoffice — security audit (neoffice-maintenance#2296): read these from the form's
+      // //// data-* attributes (HTML-escaped above), never from JS string literals built by the
+      // //// template. The old `| replace("'", ...)` escaped only the quote, so an injected closing
+      // //// script tag in a query parameter ended the script block early — reflected XSS.
+      var _form = document.getElementById('lu-form');
+      var CSRF = _form.dataset.csrf;
+      var EMAIL = _form.dataset.email;
+      var LETTER = _form.dataset.letter;
+      var TOKEN = _form.dataset.token;
 
       document.getElementById('lu-form').addEventListener('submit', async function (e) {
         e.preventDefault();

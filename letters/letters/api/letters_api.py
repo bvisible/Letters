@@ -89,6 +89,11 @@ def get_templates():
     """Return all active Letters Templates with rendered preview HTML for the picker."""
     from letters.letters.utils.email_compiler import EmailCompiler
 
+    # //// Neoffice — security audit (neoffice-maintenance#2296): require read on Letters Template.
+    # //// Without it the whole template library (blocks_json + compiled preview_html) was returned
+    # //// to any signed-in account, a portal Website User included; the picker is a Letters-author
+    # //// tool and Letters Manager / Marketing Manager hold that read.
+    frappe.has_permission("Letters Template", "read", throw=True)
     templates = frappe.get_all(
         "Letters Template",
         filters={"is_active": 1},
@@ -137,6 +142,15 @@ def render_preview(name: str | None = None, blocks: str | None = None, preview_t
             frappe.log_error(frappe.get_traceback(), "Letters render_preview error")
             frappe.throw(str(e))
     else:
+        # //// Neoffice — security audit (neoffice-maintenance#2296): the blocks branch ran for ANY
+        # //// signed-in account (a portal Website User included) with no check, driving the merge-tag
+        # //// Jinja render and writing social-icon PNGs to the public files folder for free. Gate it
+        # //// like send_test / the link checker: read on the named Letter, else create on Letter.
+        if name:
+            gate = frappe.get_doc("Letter", name)
+            frappe.has_permission("Letter", "read", doc=gate, throw=True)
+        else:
+            frappe.has_permission("Letter", "create", throw=True)
         blocks_data = blocks if isinstance(blocks, list) else json.loads(blocks or "[]")
         try:
             compiler = EmailCompiler(blocks_data, preview_text=preview_text or "", email_width=email_width or 600)
@@ -150,34 +164,21 @@ def render_preview(name: str | None = None, blocks: str | None = None, preview_t
 @frappe.whitelist(methods=["GET", "POST"])
 def get_letters(folder: str | None = None):
     """Return Letter records for the dashboard, excluding those used as notification templates."""
-    frappe.has_permission("Letter", "read", throw=True)
-    from frappe.query_builder import DocType
-
-    Letter = DocType("Letter")
-    Notification = DocType("Notification")
-
-    linked = (
-        frappe.qb.from_(Notification)
-        .select(Notification.letter)
-        .where(Notification.letter.isnotnull())
-        .where(Notification.letter != "")
+    # //// Neoffice — security audit (neoffice-maintenance#2296): list through frappe.get_list, not a
+    # //// raw frappe.qb select. The qb query applied only the Notification exclusion, so it skipped
+    # //// share scope, User Permissions and if_owner — a user to whom a single Letter was shared (or
+    # //// one narrowed by a User Permission) saw the metadata of up to 200 Letters they cannot open.
+    # //// frappe.get_list applies all of that AND the Letter permission_query_conditions hook, which
+    # //// still excludes Notification-linked Letters (letter.get_permission_query_conditions).
+    filters = {"folder": folder} if folder else None
+    return frappe.get_list(
+        "Letter",
+        filters=filters,
+        fields=["name", "title", "status", "subject", "modified", "creation", "owner", "folder"],
+        order_by="modified desc",
+        limit_page_length=200,
     )
-
-    q = (
-        frappe.qb.from_(Letter)
-        .select(
-            Letter.name, Letter.title, Letter.status, Letter.subject,
-            Letter.modified, Letter.creation, Letter.owner, Letter.folder,
-        )
-        .where(Letter.name.notin(linked))
-        .orderby(Letter.modified, order=frappe.qb.desc)
-        .limit(200)
-    )
-
-    if folder:
-        q = q.where(Letter.folder == folder)
-
-    return q.run(as_dict=True)
+    # //// Neoffice — security audit (neoffice-maintenance#2296): replaces the former raw frappe.qb tail.
 
 
 @frappe.whitelist(methods=["POST"])

@@ -33,7 +33,8 @@ def get_notification_for_letter(letter: str):
     )
 
 
-@frappe.whitelist()
+# //// Neoffice — security audit (neoffice-maintenance#2296): POST only (state-changing, CSRF).
+@frappe.whitelist(methods=["POST"])
 def create_notification_for_letter(letter: str):
     """Create a new disabled Notification linked to this Letter and return its name."""
     frappe.has_permission("Letter", "read", throw=True)
@@ -71,10 +72,18 @@ def create_notification_for_letter(letter: str):
     return {"name": notification.name}
 
 
-@frappe.whitelist()
+# //// Neoffice — security audit (neoffice-maintenance#2296): POST only. A bare @frappe.whitelist()
+# //// answers GET too, and GET skips CSRF, so a cross-site top-level link forged these records in a
+# //// logged-in victim's name (the explicit db.commit() defeated the GET auto-rollback).
+@frappe.whitelist(methods=["POST"])
 def create_notification_pair():
     """Create a blank Letter and a linked Notification together, return both names."""
     frappe.has_permission("Letter", "create", throw=True)
+    # //// Neoffice — security audit (neoffice-maintenance#2296): also require Notification create
+    # //// (System Manager), like the sibling create_notification_for_letter. Letter create alone let
+    # //// a Marketing/Letters Manager mint Notification records they otherwise cannot create, and
+    # //// gave a low-privileged author the Notification-linked Letter the preview merge-tag path needs.
+    frappe.has_permission("Notification", "create", throw=True)
 
     from letters.letters.doctype.letter._content import _unique_letter_title
 
@@ -113,7 +122,8 @@ def create_notification_pair():
     return {"letter": letter.name, "notification": notif_name}
 
 
-@frappe.whitelist()
+# //// Neoffice — security audit (neoffice-maintenance#2296): POST only (state-changing, CSRF).
+@frappe.whitelist(methods=["POST"])
 def duplicate_notification_pair(name: str):
     """Duplicate a Notification and its linked Letter together."""
     notif = frappe.get_doc("Notification", name)
@@ -136,7 +146,8 @@ def duplicate_notification_pair(name: str):
     return {"letter": dup_letter["name"], "notification": new_notif.name}
 
 
-@frappe.whitelist()
+# //// Neoffice — security audit (neoffice-maintenance#2296): POST only (state-changing, CSRF).
+@frappe.whitelist(methods=["POST"])
 def delete_notification_pair(name: str):
     """Delete a Notification and its linked Letter together."""
     notif = frappe.get_doc("Notification", name)
@@ -255,12 +266,20 @@ def _pick_sample_record(document_type: str, html: str) -> str | None:
     meta = frappe.get_meta(document_type)
     tags = set(_MERGE_TAG_RE.findall(html)) - {"name"}
     fieldnames = sorted(f for f in tags if meta.has_field(f))
-    if not fieldnames:
-        return frappe.db.get_value(document_type, {}, "name", order_by="modified desc")
-
-    candidates = frappe.get_all(
-        document_type, fields=["name", *fieldnames], order_by="modified desc", limit=20
-    )
+    # //// Neoffice — security audit (neoffice-maintenance#2296): sample ONLY among records the
+    # //// previewing user may read. frappe.get_list applies permission_query_conditions, User
+    # //// Permissions and if_owner; the former frappe.db.get_value / frappe.get_all did not, so a
+    # //// Letter author with no read on the Notification's document_type (e.g. User) got an
+    # //// arbitrary record merged into their preview. No readable record -> no sample.
+    try:
+        if not fieldnames:
+            rows = frappe.get_list(document_type, fields=["name"], order_by="modified desc", limit=1)
+            return rows[0]["name"] if rows else None
+        candidates = frappe.get_list(
+            document_type, fields=["name", *fieldnames], order_by="modified desc", limit=20
+        )
+    except frappe.PermissionError:
+        return None
     for row in candidates:
         if all(row.get(f) not in (None, "") for f in fieldnames):
             return row["name"]
@@ -297,10 +316,19 @@ def resolve_merge_tags_for_preview(html: str, letter_name: str | None) -> str:
 
     notif = frappe.get_doc("Notification", notif_name)
     doc = frappe.get_cached_doc(document_type, sample_name)
+    # //// Neoffice — security audit (neoffice-maintenance#2296): render the author-controlled Letter
+    # //// body the SAME safe way the real send does — restrict_globals=True (the render-only globals
+    # //// subset, no frappe.get_doc / frappe.db.* in the template) — and never hand the live sampled
+    # //// Document to author Jinja. A read-only snapshot (as_dict, which carries no decrypted
+    # //// password) replaces it, so {{ doc.save() }} / {{ doc.add_roles(...) }} /
+    # //// {{ doc.get_password(...) }} can no longer escalate a role or read a secret, while
+    # //// {{ doc.<field> }} still resolves against the snapshot.
     context = get_context(doc)
-    context.update({"alert": notif, "comments": None})
+    context["doc"] = doc.as_dict()
+    context.update({"alert": notif.as_dict(), "comments": None})
+    # //// Neoffice — security audit (neoffice-maintenance#2296): restrict_globals=True, as the send does.
     try:
-        return frappe.render_template(html, context)
+        return frappe.render_template(html, context, restrict_globals=True)
     except Exception:
         return html
 
@@ -320,7 +348,8 @@ def neutralize_unresolved_merge_tags(text: str) -> str:
     return _MERGE_TAG_RE.sub(lambda m: f"[{m.group(1)}]", text)
 
 
-@frappe.whitelist()
+# //// Neoffice — security audit (neoffice-maintenance#2296): POST only (state-changing, CSRF).
+@frappe.whitelist(methods=["POST"])
 def create_letter_for_notification(notification: str):
     """Create a blank Letter, link it to an existing Notification, and return the letter name."""
     frappe.has_permission("Notification", "write", throw=True)

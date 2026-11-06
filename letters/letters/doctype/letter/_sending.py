@@ -205,6 +205,10 @@ def _resolve_recipients(email_group, recipients, doctype_config, max_recipients,
     Throws on empty or oversized results so the caller gets a clear error.
     """
     if email_group:
+        # //// Neoffice — security audit (neoffice-maintenance#2296): require Email Group read before
+        # //// reading its members, consistent with get_email_groups (the picker). Letter write alone
+        # //// let an author mail every member of a group they cannot read by naming it on the send.
+        frappe.has_permission("Email Group", "read", throw=True)
         members = frappe.get_all(
             "Email Group Member",
             filters={"email_group": email_group, "unsubscribed": 0},

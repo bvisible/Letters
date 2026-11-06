@@ -6,6 +6,13 @@ import frappe
 from frappe import _
 
 
+# //// Neoffice — security audit (neoffice-maintenance#2296): the audience picker is a Letters-author
+# //// tool. Its endpoints checked only read on the caller-chosen target doctype, so a portal Website
+# //// User (automatic `All` role: if_owner read on Contact/Address/Communication, read on File/ToDo/
+# //// Event/Notification Log) could drive the recipient-count oracle and enumerate doctypes/fields.
+# //// Gate them on Letter create (the Letters authoring roles); the per-doctype read check stays.
+def _require_letter_author():
+    frappe.has_permission("Letter", "create", throw=True)
 
 
 def _load_recipient_config(doc):
@@ -96,6 +103,11 @@ def _resolve_single_source_emails(source):
     emails = []
 
     if stype == "group":
+        # //// Neoffice — security audit (neoffice-maintenance#2296): require Email Group read before
+        # //// reading its members, as get_email_groups already does for the picker. Without it a
+        # //// Letter writer (no Newsletter Manager role, so no Email Group / Email Group Member rows)
+        # //// could resolve and mail the members of any group by passing its title to the send path.
+        frappe.has_permission("Email Group", "read", throw=True)
         members = frappe.get_all(
             "Email Group Member",
             filters={"email_group": source.get("email_group", ""), "unsubscribed": 0},
@@ -196,6 +208,7 @@ def _is_email_field(df):
 @frappe.whitelist(methods=["GET", "POST"])
 def get_doctypes_with_email_fields():
     """Return doctypes that have at least one email field, that the user can read."""
+    _require_letter_author()  # //// Neoffice — security audit (neoffice-maintenance#2296)
     DocField    = frappe.qb.DocType("DocField")
     CustomField = frappe.qb.DocType("Custom Field")
 
@@ -230,6 +243,7 @@ def get_doctypes_with_email_fields():
 @frappe.whitelist(methods=["GET", "POST"])
 def get_email_fields(doctype: str):
     """Return field names/labels of email fields for a doctype (incl. custom fields)."""
+    _require_letter_author()  # //// Neoffice — security audit (neoffice-maintenance#2296)
     frappe.has_permission(doctype, "read", throw=True)
     meta = frappe.get_meta(doctype)
     return [
@@ -249,6 +263,7 @@ def get_doctype_filter_fields(doctype: str):
     narrow recipients by criteria like Status, Territory, or creation date.
     Also always includes "creation" and "modified" system fields.
     """
+    _require_letter_author()  # //// Neoffice — security audit (neoffice-maintenance#2296)
     frappe.has_permission(doctype, "read", throw=True)
     meta = frappe.get_meta(doctype)
 
@@ -290,6 +305,7 @@ def get_doctype_filter_fields(doctype: str):
 @frappe.whitelist(methods=["GET", "POST"])
 def count_doctype_recipients(doctype: str, email_field: str, filters: str | None = None):
     """Preview how many records match the given filter config."""
+    _require_letter_author()  # //// Neoffice — security audit (neoffice-maintenance#2296)
     frappe.has_permission(doctype, "read", throw=True)
     filter_dict = json.loads(filters) if isinstance(filters, str) else (filters or {})
     filter_dict[email_field] = ["!=", ""]
@@ -375,6 +391,7 @@ def create_email_group_from_source(title: str, source_config: str):
     Returns the new group's name, title, and member count so the frontend can
     convert the source block to a group-type block pointing at the new group.
     """
+    _require_letter_author()  # //// Neoffice — security audit (neoffice-maintenance#2296)
     source = json.loads(source_config) if isinstance(source_config, str) else source_config
     if not isinstance(source, dict):
         frappe.throw(_("Invalid source configuration."))
