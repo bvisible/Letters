@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Letters VERSION\n"
 "Report-Msgid-Bugs-To: palkan@frappe.io\n"
-"POT-Creation-Date: 2026-11-03 03:18+0000\n"
+"POT-Creation-Date: 2026-11-07 03:16+0000\n"
 "PO-Revision-Date: 2026-07-10 18:13+0034\n"
 "Last-Translator: palkan@frappe.io\n"
 "Language-Team: palkan@frappe.io\n"
@@ -23,7 +23,7 @@ msgstr ""
 msgid "'{0}' is not a valid email address."
 msgstr "« {0} » n'est pas une adresse e-mail valide."
 
-#: letters/letters/api/letters_api.py:192
+#: letters/letters/api/letters_api.py:193
 #, python-brace-format
 msgid "A template named {0} already exists"
 msgstr "Un modèle nommé {0} existe déjà"
@@ -33,7 +33,7 @@ msgstr "Un modèle nommé {0} existe déjà"
 msgid "Active"
 msgstr "Actif"
 
-#: letters/letters/doctype/letter/_sending.py:245
+#: letters/letters/doctype/letter/_sending.py:249
 msgid "All selected recipients have unsubscribed from this letter."
 msgstr ""
 "Tous les destinataires sélectionnés se sont désabonnés de cette lettre."
@@ -183,7 +183,7 @@ msgstr "Inclure le lien de désabonnement"
 msgid "Invalid email address."
 msgstr "Adresse e-mail invalide."
 
-#: letters/letters/api/recipients.py:380
+#: letters/letters/api/recipients.py:397
 msgid "Invalid source configuration."
 msgstr "Configuration de la source invalide."
 
@@ -258,19 +258,19 @@ msgstr "Responsable marketing"
 msgid "New Letter"
 msgstr "Nouvelle lettre"
 
-#: letters/letters/api/links.py:246
+#: letters/letters/api/links.py:257
 msgid "No blocks provided."
 msgstr "Aucun bloc fourni."
 
-#: letters/letters/api/recipients.py:157
+#: letters/letters/api/recipients.py:169
 msgid "No recipients found across all selected audience sources."
 msgstr "Aucun destinataire trouvé parmi les sources d'audience sélectionnées."
 
-#: letters/letters/doctype/letter/_sending.py:237
+#: letters/letters/doctype/letter/_sending.py:241
 msgid "No recipients provided."
 msgstr "Aucun destinataire fourni."
 
-#: letters/letters/doctype/letter/_sending.py:229
+#: letters/letters/doctype/letter/_sending.py:233
 msgid "No records match the selected filters."
 msgstr "Aucun enregistrement ne correspond aux filtres sélectionnés."
 
@@ -278,12 +278,12 @@ msgstr "Aucun enregistrement ne correspond aux filtres sélectionnés."
 msgid "No send found for this letter."
 msgstr "Aucun envoi trouvé pour cette lettre."
 
-#: letters/letters/api/recipients.py:385
+#: letters/letters/api/recipients.py:402
 msgid "No valid email addresses found in this source."
 msgstr "Aucune adresse e-mail valide trouvée dans cette source."
 
-#: letters/letters/api/recipients.py:161
-#: letters/letters/doctype/letter/_sending.py:249
+#: letters/letters/api/recipients.py:173
+#: letters/letters/doctype/letter/_sending.py:253
 msgid "No valid email addresses to send to."
 msgstr "Aucune adresse e-mail valide à qui envoyer."
 
@@ -461,12 +461,12 @@ msgstr "Gestionnaire Système"
 msgid "Templates"
 msgstr "Modèles"
 
-#: letters/letters/doctype/letter/_sending.py:215
+#: letters/letters/doctype/letter/_sending.py:219
 msgid "The selected Email Group has no active subscribers."
 msgstr "Le groupe d'e-mails sélectionné n'a aucun abonné actif."
 
-#: letters/letters/api/recipients.py:165
-#: letters/letters/doctype/letter/_sending.py:253
+#: letters/letters/api/recipients.py:177
+#: letters/letters/doctype/letter/_sending.py:257
 #, python-brace-format
 msgid ""
 "This audience has more than {0} recipients, which is above the per-letter "
@@ -541,7 +541,7 @@ msgstr "Total des destinataires"
 msgid "Unsubscribe"
 msgstr "Se désabonner"
 
-#: letters/letters/doctype/letter/_sending.py:223
+#: letters/letters/doctype/letter/_sending.py:227
 msgid "doctype_config must include doctype and email_field."
 msgstr "doctype_config doit inclure doctype et email_field."
 
