@@ -174,7 +174,14 @@ def resume_send(name: str):
             "not stuck. Check back shortly instead of resuming."
         ))
 
-    all_emails = frappe.get_all("Email Send Recipient", filters={"parent": send.name}, pluck="email")
+    # Invalid rows are never queued by design (see _execute_send) — exclude
+    # them here too, otherwise they'd always show up as "missing" and this
+    # would try to send to them.
+    all_emails = frappe.get_all(
+        "Email Send Recipient",
+        filters={"parent": send.name, "status": ["!=", "Invalid"]},
+        pluck="email",
+    )
     queued_emails = {
         r[0] for r in frappe.db.sql(
             """
@@ -289,7 +296,7 @@ def _resume_send(send_doc_name, letter_name, letter_doc):
     """Re-enqueue a partial/failed Email Send."""
     unsent = frappe.db.count(
         "Email Send Recipient",
-        {"parent": send_doc_name, "status": ["!=", "Sent"]},
+        {"parent": send_doc_name, "status": ["not in", ["Sent", "Invalid"]]},
     )
     frappe.db.set_value("Email Send", send_doc_name, "status", "Sending")
     letter_doc.status = "Sending"
@@ -299,7 +306,7 @@ def _resume_send(send_doc_name, letter_name, letter_doc):
     return {"queued": True, "count": unsent, "resumed": True}
 
 
-def _bulk_insert_recipients(send_doc_name, recipient_list):
+def _bulk_insert_recipients(send_doc_name, recipient_list, status="Pending", start_idx=1):
     """Write child rows for an Email Send in one batched INSERT."""
     now  = frappe.utils.now()
     user = frappe.session.user
@@ -310,7 +317,7 @@ def _bulk_insert_recipients(send_doc_name, recipient_list):
     values = [
         (
             frappe.generate_hash(length=10), now, now, user, user, 0,
-            idx + 1, send_doc_name, "recipients", "Email Send", email, "Pending",
+            start_idx + idx, send_doc_name, "recipients", "Email Send", email, status,
         )
         for idx, email in enumerate(recipient_list)
     ]
@@ -366,7 +373,9 @@ def _execute_send(send_doc_name, letter_name):
         compiler = EmailCompiler(blocks_json, preview_text=preview_text, email_width=email_width)
         html = compiler.compile()
 
-        pending = [row.email for row in send_doc.recipients if row.status != "Sent"]
+        # Invalid rows were never resolved to an address worth queuing — they
+        # exist purely so the Recipients tab can show them, not to be sent.
+        pending = [row.email for row in send_doc.recipients if row.status not in ("Sent", "Invalid")]
         if pending:
             _queue_recipients(send_doc, letter_name, pending, subject, html)
             # queue_separately hands each address to the Email Queue. Mark the
@@ -375,7 +384,7 @@ def _execute_send(send_doc_name, letter_name):
             # (see _delivery_counts / get_send_progress).
             frappe.db.sql(
                 "update `tabEmail Send Recipient` set status='Sent' "
-                "where parent=%s and status!='Sent'",
+                "where parent=%s and status not in ('Sent', 'Invalid')",
                 send_doc_name,
             )
 
@@ -384,7 +393,10 @@ def _execute_send(send_doc_name, letter_name):
         # status once core's Email Queue has drained.
         frappe.db.set_value(
             "Email Send", send_doc_name,
-            {"status": "Sending", "sent_count": len(send_doc.recipients)},
+            {
+                "status": "Sending",
+                "sent_count": len([r for r in send_doc.recipients if r.status != "Invalid"]),
+            },
             update_modified=False,
         )
         frappe.db.set_value(
@@ -402,11 +414,57 @@ def _execute_send(send_doc_name, letter_name):
             (
                 frappe.qb.update(recipient)
                 .set(recipient.status, "Failed")
-                .where((recipient.parent == send_doc_name) & (recipient.status != "Sent"))
+                .where((recipient.parent == send_doc_name) & (~recipient.status.isin(["Sent", "Invalid"])))
             ).run()
             frappe.db.commit()
         except Exception:
             frappe.log_error(frappe.get_traceback(), "Letters _execute_send cleanup error")
+
+
+#: Fixed English text Frappe core always appends after the unsubscribe link
+#: (frappe.email.queue.get_unsubscribe_message) - there's no parameter to
+#: suppress it, so strip_unsubscribe_sentence removes this exact substring.
+UNSUBSCRIBE_SENTENCE_SUFFIX = " to stop receiving emails of this type"
+
+
+def _append_unsubscribe_footer(html):
+    """Insert core's unsubscribe-link marker before </body>.
+
+    raw_html=True (needed so Gmail keeps our <style> media queries) skips
+    core's footer-TEMPLATE insertion, but core still swaps a real anchor tag
+    in for this exact marker regardless of raw_html - see the unconditional
+    `if unsubscribe_link: html = html.replace("<!--unsubscribe link here-->", ...)`
+    in frappe.email.email_body.get_formatted_html. That swap happens *after*
+    scrub_urls() runs, which matters: building the <a href="<!--unsubscribe_url-->">
+    ourselves ahead of time would have scrub_urls mistake the still-unresolved
+    placeholder for a relative link and prefix the site URL onto it *before*
+    the real per-recipient URL gets substituted in later, producing a doubled
+    URL. Letting core insert the anchor at its own safe, post-scrub point
+    avoids that. Core's template also appends a fixed English sentence after
+    the link with no parameter to suppress it - see strip_unsubscribe_sentence.
+    """
+    marker = "<!--unsubscribe link here-->"
+    if "</body>" in html:
+        return html.replace("</body>", marker + "</body>", 1)
+    return html + marker
+
+
+def strip_unsubscribe_sentence(doc, method=None):
+    """Email Queue after_insert hook.
+
+    Core's unsubscribe footer (see _append_unsubscribe_footer) always reads
+    "<link> to stop receiving emails of this type", with no override
+    parameter for that trailing sentence. Letters only wants the bare link,
+    so strip the known fixed suffix off any Letter-referencing queue row.
+    """
+    if doc.reference_doctype != "Letter":
+        return
+    if UNSUBSCRIBE_SENTENCE_SUFFIX not in (doc.message or ""):
+        return
+    doc.db_set(
+        "message", doc.message.replace(UNSUBSCRIBE_SENTENCE_SUFFIX, ""),
+        update_modified=False,
+    )
 
 
 def _queue_recipients(send_doc, letter_name, emails, subject, html):
@@ -425,6 +483,9 @@ def _queue_recipients(send_doc, letter_name, emails, subject, html):
         unsubscribe_method = "/api/method/letters.letters.api.unsubscribe.unsubscribe_redirect"
     else:
         unsubscribe_method = None
+
+    if unsubscribe_method:
+        html = _append_unsubscribe_footer(html)
 
     letter = frappe.get_doc("Letter", letter_name)
     sender_email = (letter.sender_email or "").strip()
@@ -445,7 +506,7 @@ def _queue_recipients(send_doc, letter_name, emails, subject, html):
         reference_doctype="Letter",
         reference_name=letter_name,
         unsubscribe_method=unsubscribe_method,
-        unsubscribe_message=_("Unsubscribe") if include_unsub else None,
+        unsubscribe_message=_("Unsubscribe here") if include_unsub else None,
         add_unsubscribe_link=1 if include_unsub else 0,
         email_read_tracker_url="/api/method/letters.letters.api.track_open",
     )
@@ -517,10 +578,25 @@ def _reconcile_send_status(letter_name, send_name, total, current_status, queued
 
 def reconcile_active_sends():
     """Scheduled fallback: settle Letters stuck in 'Sending' once their Email
-    Queue has drained, for sends nobody is actively polling in the builder."""
+    Queue has drained, for sends nobody is actively polling in the builder.
+
+    Also re-checks recently-settled 'Partial' letters. A Partial settle isn't
+    necessarily final — failed rows can be manually retried straight from the
+    Email Queue list view, outside of Letters entirely, and nothing else would
+    tell Letters to look again. Bounded to the last 24 hours (rather than
+    "still has an Error row") since a successful retry clears the Error row
+    that would otherwise be needed to notice the retry happened at all.
+    """
     from frappe.utils import add_to_date, now_datetime
 
-    for letter_name in frappe.get_all("Letter", filters={"status": "Sending"}, pluck="name"):
+    sending = frappe.get_all("Letter", filters={"status": "Sending"}, pluck="name")
+    recently_partial = frappe.get_all(
+        "Letter",
+        filters={"status": "Partial", "modified": [">", add_to_date(now_datetime(), hours=-24)]},
+        pluck="name",
+    )
+
+    for letter_name in [*sending, *recently_partial]:
         try:
             sends = frappe.get_all(
                 "Email Send",

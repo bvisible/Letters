@@ -184,6 +184,12 @@ export function useLetter(editorStore, { initialName = null, skipTemplatePrompt 
       if (doc.status === "Sending") {
         sendProgress.value = { status: "Sending", sent: 0, delivered: 0, failed: 0, total: 0 };
         _startProgressPolling();
+      } else if (["Partial", "Failed"].includes(doc.status)) {
+        // A settled Partial/Failed send can still change later — e.g. someone
+        // manually retries failed rows from the Email Queue list view, outside
+        // of Letters entirely. Refresh once so the toolbar isn't stuck showing
+        // whatever was true at the last settle.
+        _refreshSendProgressOnce(name);
       }
       // Allow one Vue flush cycle before re-enabling dirty tracking
       await Promise.resolve();
@@ -330,12 +336,12 @@ export function useLetter(editorStore, { initialName = null, skipTemplatePrompt 
         }
       }
       const res = await frappe.call({ method: "letters.letters.api.send_letter", args });
-      const { count, skipped_invalid } = res.message;
-      let msg = `Queued for ${count} recipient${count === 1 ? "" : "s"}!`;
-      if (skipped_invalid > 0) {
-        msg += ` (${skipped_invalid} invalid address${skipped_invalid === 1 ? "" : "es"} skipped)`;
-      }
-      toast.success(msg);
+      const { count } = res.message;
+      // Invalid addresses aren't just mentioned in passing here — they're
+      // written to the recipient list with an "Invalid" status (see
+      // LetterSettings' Recipients tab), so there's no need to also call
+      // them out in this transient toast.
+      toast.success(`Queued for ${count} recipient${count === 1 ? "" : "s"}!`);
       sendProgress.value = { status: "Queued", sent: 0, delivered: 0, failed: 0, total: count };
       if (editorStore.letterDoc) editorStore.letterDoc.status = "Sending";
       _startProgressPolling();
@@ -349,6 +355,24 @@ export function useLetter(editorStore, { initialName = null, skipTemplatePrompt 
       toast.error(msg);
     } finally {
       sending.value = false;
+    }
+  }
+
+  async function _refreshSendProgressOnce(name) {
+    try {
+      const r = await frappe.call({
+        method: "letters.letters.api.get_send_progress",
+        args: { name },
+      });
+      sendProgress.value = r.message;
+      if (editorStore.letterDoc && r.message.status !== editorStore.letterDoc.status) {
+        editorStore.letterDoc.status = r.message.status;
+      }
+      // The backend may have just settled this to "Sending" again (a retry
+      // brought failed rows back to life) — pick up live polling if so.
+      if (r.message.status === "Sending") _startProgressPolling();
+    } catch {
+      // Best-effort refresh; leave the last-known progress on the toolbar.
     }
   }
 

@@ -52,3 +52,13 @@ permission_query_conditions = {
 # //// recipient must always be able to leave the list. Read by frappe/website/path_resolver.py
 # //// (website_route_stays_open, neoffice-maintenance#2171).
 website_maintenance_open_routes = ["letters_unsubscribe"]
+
+doc_events = {
+    "Custom DocPerm": {
+        "on_update": "letters.letters.permissions.sync_letter_builder_page_roles",
+        "on_trash": "letters.letters.permissions.sync_letter_builder_page_roles",
+    },
+    "Email Queue": {
+        "after_insert": "letters.letters.api.sending.strip_unsubscribe_sentence",
+    },
+}
